@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#185FA5">
+<title>RepairFlow – démo</title>
+<style>
+  :root { --bg:#f4f3ef; --card:#fff; --soft:#f1efe8; --text:#1f1e1c; --muted:#6b6a65; --border:#d9d7cf;
+          --accent:#185FA5; --accent-bg:#E6F1FB; --on-accent:#fff; --danger:#A32D2D; --danger-bg:#FCEBEB;
+          --warn:#854F0B; --warn-bg:#FAEEDA; --ok:#27500A; --ok-bg:#EAF3DE; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#1c1c1b; --card:#2a2a28; --soft:#333331; --text:#ecebe6; --muted:#a5a39b; --border:#44443f;
+            --accent:#378ADD; --accent-bg:#0C447C; --on-accent:#fff; --danger:#F09595; --danger-bg:#501313;
+            --warn:#FAC775; --warn-bg:#412402; --ok:#C0DD97; --ok-bg:#173404; }
+  }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button { font-family:inherit; cursor:pointer; }
+  .app { max-width:430px; min-height:100vh; min-height:100dvh; margin:0 auto; background:var(--card); padding:14px 14px calc(18px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:10px; }
+  @media (max-width:499px) { html, body { background:var(--card); } }
+  @media (min-width:500px) { body { padding:24px 0; } .app { min-height:760px; border:1px solid var(--border); border-radius:28px; } }
+  .demo { font-size:11px; color:var(--muted); text-align:center; }
+  .bar { display:flex; justify-content:space-between; align-items:center; width:100%; font-size:14px; background:var(--soft); color:var(--text); border:none; border-radius:10px; padding:10px 12px; text-align:left; }
+  .missing { color:var(--warn); }
+  .chev { color:var(--muted); }
+  .h { font-size:14px; font-weight:600; margin:6px 0 0; }
+  .row { border-bottom:1px solid var(--border); padding:10px 2px; font-size:14px; line-height:1.4; display:flex; justify-content:space-between; gap:8px; }
+  .row b { font-weight:600; display:block; }
+  .meta { color:var(--muted); font-size:13px; }
+  .due { font-size:13px; white-space:nowrap; text-align:right; }
+  .late { color:var(--danger); }
+  .empty { font-size:13px; color:var(--muted); padding:10px 2px; }
+  .big { margin-top:auto; height:64px; border:none; border-radius:14px; background:var(--accent); color:var(--on-accent); font-size:19px; font-weight:600; letter-spacing:.5px; }
+  .field { height:46px; border:1px solid var(--border); border-radius:10px; padding:0 12px; font-size:16px; background:transparent; color:var(--text); width:100%; }
+  .logo { font-size:24px; font-weight:700; text-align:center; margin:48px 0 4px; }
+  .tag { text-align:center; font-size:13px; color:var(--muted); margin:0 0 24px; }
+  .small { font-size:12px; color:var(--muted); text-align:center; margin:0; }
+  .cam { height:190px; border:1px dashed var(--border); border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--muted); font-size:14px; }
+  .qr { font-size:46px; line-height:1; }
+  .sim { font-size:12px; color:var(--muted); margin:4px 0 0; }
+  .opt { min-height:48px; border:1px solid var(--border); border-radius:10px; background:transparent; color:var(--text); font-size:15px; text-align:left; padding:8px 12px; width:100%; }
+  .opt small { display:block; color:var(--muted); font-size:12px; }
+  .title { font-size:17px; font-weight:600; margin:0; }
+  .sub { font-size:13px; color:var(--muted); margin:2px 0 0; }
+  .scanned { font-size:13px; color:var(--ok); background:var(--ok-bg); border-radius:8px; padding:6px 8px; }
+  .done { font-size:14px; color:var(--ok); background:var(--ok-bg); border-radius:8px; padding:9px; }
+  .done b { font-weight:600; }
+  .facts { font-size:14px; line-height:1.8; border:1px solid var(--border); border-radius:10px; padding:6px 10px; }
+  .lbl2 { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .facts div { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+  .facts span:first-child { color:var(--muted); }
+  .chg { background:var(--accent-bg); color:var(--accent); border-radius:4px; padding:0 4px; }
+  .link { border:none; background:transparent; color:var(--accent); font-size:13px; padding:0 0 0 6px; }
+  .primary { min-height:54px; border:none; border-radius:12px; background:var(--accent); color:var(--on-accent); font-size:17px; font-weight:600; width:100%; }
+  .primary small { display:block; font-size:12px; font-weight:400; opacity:.9; }
+  .lbl { font-size:13px; color:var(--muted); margin:2px 0 0; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .grid button { height:44px; border:1px solid var(--border); border-radius:8px; background:transparent; color:var(--text); font-size:15px; }
+  .foot { margin-top:auto; display:flex; gap:8px; }
+  .foot button { flex:1; height:46px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--text); font-size:15px; }
+  .foot button.go { border:none; background:var(--accent); color:var(--on-accent); font-weight:600; }
+  .close { height:44px; border:none; background:transparent; color:var(--muted); font-size:15px; margin-top:auto; }
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); display:flex; align-items:flex-end; justify-content:center; z-index:10; }
+  .sheet { width:100%; max-width:430px; background:var(--card); border-radius:20px 20px 0 0; padding:18px 14px calc(18px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:10px; }
+  .sheet h3 { margin:0; font-size:17px; font-weight:600; }
+  .sheet p { margin:0; font-size:14px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+const ACTIONS = { 'Tester': 2, 'Réparer': 10, 'Nettoyer': 1, 'Garantie': 15, 'Mettre en vente': 2 };
+const LIEUX = ['WiFix Cavell', 'WiFix Vekemans', 'WiFix Janson'];
+
+function day(n) { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + n); return d; }
+function fmt(d) { return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); }
+function hhmm(d) { return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); }
+function isLate(d) { return d < day(0); }
+
+function initialDevices() {
+  return [
+    { crf: 'CRF-JA100064', name: 'ASUS TUF Gaming F15', short: 'ASUS TUF F15', sub: 'Laptop · SN K3N0CV12345 · ne démarre pas', resp: 'Abdel', since: day(-3), action: 'Réparer', due: day(7) },
+    { crf: 'CRF-JA100071', name: 'Samsung Galaxy S21', short: 'Galaxy S21', sub: 'Smartphone · SN R58R31ABCDE · écran fissuré', resp: 'Sofian', since: day(-6), action: 'Tester', due: day(-2) },
+    { crf: 'CRF-JB200015', name: 'Lenovo IdeaPad 5', short: 'Lenovo IdeaPad 5', sub: 'Laptop · SN PF3XYZ12 · clavier HS', resp: 'Sofian', since: day(-4), action: 'Garantie', due: day(12) },
+    { crf: 'CRF-JB200022', name: 'Apple iPhone 12 64 Go', short: 'iPhone 12 64 Go', sub: 'Smartphone · SN F2LXK0ABCD · batterie', resp: 'Sofian', since: day(-1), action: 'Mettre en vente', due: day(1) },
+  ];
+}
+
+const S = { screen: 'login', user: null, lieu: null, sheet: null, afterLieu: null, cur: null, scanAt: null, msg: null, changed: [], devices: initialDevices() };
+const app = document.getElementById('app');
+
+function dev() { return S.devices.find(d => d.crf === S.cur); }
+function go(screen) { S.screen = screen; S.sheet = null; render(); window.scrollTo(0, 0); }
+function buzz() { if (navigator.vibrate) navigator.vibrate(40); }
+function c(key) { return S.changed.includes(key) ? 'chg' : ''; }
+
+function bar() {
+  const where = S.lieu ? `📍 ${S.lieu}` : `<span class="missing">📍 aucun lieu</span>`;
+  return `<button class="bar" data-act="menu"><span>👤 ${S.user} — ${where}</span><span class="chev">▾</span></button>`;
+}
+
+const screens = {
+  login: () => `
+    <div class="logo">RepairFlow</div>
+    <p class="tag">Un appareil, un témoin, un responsable</p>
+    <input class="field" value="sofian" aria-label="Identifiant">
+    <input class="field" type="password" value="demo1234" aria-label="Mot de passe">
+    <button class="primary" data-act="login" style="margin-top:6px;">Se connecter</button>
+    <p class="small" style="margin-top:auto;">Tu restes connecté sur ce téléphone.</p>
+    <p class="demo">Maquette de démonstration · données fictives</p>`,
+
+  home: () => {
+    const mine = S.devices.filter(d => d.resp === S.user);
+    const rows = mine.length ? mine.map(d => `
+      <div class="row"><div><b>${d.short}</b><span class="meta">${d.action}</span></div>
+      <div class="due ${isLate(d.due) ? 'late' : ''}">${fmt(d.due)}</div></div>`).join('')
+      : `<div class="empty">Aucun appareil sous ta responsabilité.</div>`;
+    return `${bar()}<p class="h">Mes appareils</p>${rows}
+      <button class="big" data-act="scanner">SCANNER</button>
+      <p class="demo">Maquette de démonstration · données fictives</p>`;
+  },
+
+  scan: () => `
+    ${bar()}
+    <div class="cam"><div class="qr">▣</div>Vise le QR code du CRF</div>
+    <p class="sim">Simulation : touche un QR pour le « scanner »</p>
+    ${S.devices.filter(d => d.crf === 'CRF-JA100064' || d.crf === 'CRF-JA100071').map(d => `
+      <button class="opt" data-act="scan:${d.crf}">▣ ${d.crf}<small>${d.name} · responsable ${d.resp === S.user ? 'toi' : d.resp}</small></button>`).join('')}
+    <button class="close" data-act="home">Annuler</button>`,
+
+  fiche: () => {
+    const d = dev();
+    const mine = d.resp === S.user;
+    const banner = S.msg
+      ? `<div class="done">✓ <b>${S.msg}</b></div>`
+      : `<div class="scanned">✓ Scan enregistré · ${S.user} · ${S.lieu} · ${hhmm(S.scanAt)}</div>`;
+    const others = Object.keys(ACTIONS).filter(a => a !== d.action);
+    return `${bar()}
+      <div><p class="title">${d.name}</p><p class="sub">${d.crf} · ${d.sub}</p></div>
+      ${banner}
+      <div class="facts">
+        <span class="lbl2">Situation actuelle</span>
+        <div><span>Responsable</span><span class="${c('resp')}">${d.resp} · depuis ${fmt(d.since)}</span></div>
+        <div><span>Action</span><span class="${c('action')}">${d.action}</span></div>
+        <div><span>Échéance</span><span><span class="${c('due')} ${isLate(d.due) ? 'late' : ''}">${fmt(d.due)}</span>${mine ? `<button class="link" data-act="due">✎ modifier</button>` : ''}</span></div>
+      </div>
+      ${mine ? '' : `<button class="primary" data-act="take">Je le prends<small>${d.action} et ${fmt(d.due)} inchangés</small></button>`}
+      <p class="lbl">${mine ? "Choisir l'action suivante" : "Ou choisir l'action suivante (vaut prise en charge)"}</p>
+      <div class="grid">${others.map(a => `<button data-act="act:${a}">${a}</button>`).join('')}</div>
+      ${mine
+        ? `<div class="foot"><button data-act="home">Accueil</button><button class="go" data-act="scanner">Scanner un autre</button></div>`
+        : `<button class="close" data-act="home">Fermer (consultation)</button>`}`;
+  },
+};
+
+const sheets = {
+  lieu: () => `
+    <h3>Active ton lieu de travail</h3>
+    <p>Scanne le QR code du magasin où tu es aujourd'hui.</p>
+    <div class="cam" style="height:120px;"><div class="qr">▣</div>QR du magasin</div>
+    <p class="sim">Simulation : touche le QR d'un magasin</p>
+    ${LIEUX.map(l => `<button class="opt" data-act="lieu:${l}">▣ ${l}</button>`).join('')}
+    <p class="small">Valable jusqu'à ce soir.</p>
+    <button class="close" data-act="closesheet">Annuler</button>`,
+
+  menu: () => `
+    <h3>👤 ${S.user}</h3>
+    <p>${S.lieu ? `📍 ${S.lieu} · actif jusqu'à ce soir` : '📍 Aucun lieu actif'}</p>
+    <button class="opt" data-act="changelieu">Changer de lieu</button>
+    <button class="opt" data-act="logout">Se déconnecter / changer d'utilisateur</button>
+    <button class="opt" data-act="reset">Recommencer la démo</button>
+    <button class="close" data-act="closesheet">Fermer</button>`,
+
+  due: () => {
+    const d = dev();
+    const iso = d.due.toISOString().slice(0, 10);
+    return `
+    <h3>Modifier l'échéance</h3>
+    <p>${d.action} · ${d.short}</p>
+    <input class="field" type="date" id="duein" value="${iso}">
+    <button class="primary" data-act="savedue">Enregistrer</button>
+    <button class="close" data-act="closesheet">Annuler</button>`;
+  },
+};
+
+function render() {
+  app.innerHTML = screens[S.screen]();
+  const old = document.querySelector('.overlay');
+  if (old) old.remove();
+  if (S.sheet) {
+    const o = document.createElement('div');
+    o.className = 'overlay';
+    o.innerHTML = `<div class="sheet">${sheets[S.sheet]()}</div>`;
+    o.addEventListener('click', e => { if (e.target === o) { S.sheet = null; render(); } });
+    document.body.appendChild(o);
+  }
+}
+
+function act(a) {
+  const d = S.cur ? dev() : null;
+  if (a === 'login') { S.user = 'Sofian'; return go('home'); }
+  if (a === 'home') { S.cur = null; S.msg = null; S.changed = []; return go('home'); }
+  if (a === 'menu') { S.sheet = 'menu'; return render(); }
+  if (a === 'closesheet') { S.sheet = null; return render(); }
+  if (a === 'changelieu') { S.sheet = 'lieu'; S.afterLieu = null; return render(); }
+  if (a === 'logout') { S.user = null; S.lieu = null; S.cur = null; return go('login'); }
+  if (a === 'reset') { location.reload(); return; }
+  if (a === 'scanner') {
+    if (!S.lieu) { S.sheet = 'lieu'; S.afterLieu = 'scan'; return render(); }
+    S.cur = null; S.msg = null; S.changed = [];
+    return go('scan');
+  }
+  if (a.startsWith('lieu:')) {
+    S.lieu = a.slice(5); buzz();
+    if (S.afterLieu === 'scan') { S.afterLieu = null; S.cur = null; S.msg = null; S.changed = []; return go('scan'); }
+    S.sheet = null; return render();
+  }
+  if (a.startsWith('scan:')) {
+    S.cur = a.slice(5); S.scanAt = new Date(); S.msg = null; S.changed = []; buzz();
+    return go('fiche');
+  }
+  if (a === 'take') {
+    d.resp = S.user; d.since = new Date();
+    S.msg = 'Tu es responsable de cet appareil'; S.changed = ['resp']; buzz();
+    return render();
+  }
+  if (a.startsWith('act:')) {
+    const name = a.slice(4);
+    const changed = ['action', 'due'];
+    if (d.resp !== S.user) { d.resp = S.user; d.since = new Date(); changed.push('resp'); }
+    d.action = name; d.due = day(ACTIONS[name]);
+    S.msg = `${name} · échéance ${fmt(d.due)}`; S.changed = changed; buzz();
+    return render();
+  }
+  if (a === 'due') { S.sheet = 'due'; return render(); }
+  if (a === 'savedue') {
+    const v = document.getElementById('duein').value;
+    if (v) { const nd = new Date(v + 'T12:00:00'); d.due = nd; S.msg = `Échéance modifiée · ${fmt(nd)}`; S.changed = ['due']; }
+    S.sheet = null; return render();
+  }
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (b) act(b.dataset.act);
+});
+
+render();
+</script>
+</body>
+</html>
